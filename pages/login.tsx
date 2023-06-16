@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from 'react';
 import '../app/globals.css'
-import { useTokenValidation, saveToken, getToken } from '../helper/cookies_helper'
+import { saveToken } from '../helper/cookies_helper'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {

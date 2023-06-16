@@ -1,21 +1,25 @@
 'use client';
 import { setCookie, parseCookies } from 'nookies'
+import { useEffect } from 'react';
 import { useRouter } from 'next/router'
 import jwt from 'jsonwebtoken';
 
-export function useTokenValidation() {
-
-    const token = getToken();
-    let decode;
-    console.log(decode);
-    jwt.verify(token, process.env.NEXT_PUBLIC_SECRET_TOKEN, function (err, decoded) {
-        if (err) {
-            const router = useRouter();
-            router.push('/login');
-            destroyCookie(null, 'token');
-        }
-    });
-}
+export const withAuth = (WrappedComponent) => {
+    const AuthenticatedComponent = (props) => {
+        const router = useRouter();
+        useEffect(() => {
+            const token = getToken();
+            jwt.verify(token, process.env.NEXT_PUBLIC_SECRET_TOKEN, function (err, decoded) {
+                if (err) {
+                    router.push('/login');
+                    destroyCookie(null, 'token');
+                }
+            });
+        }, []);
+        return <WrappedComponent {...props} />;
+    };
+    return AuthenticatedComponent;
+};
 
 export function destroyToken() {
     destroyCookie(null, 'token');
