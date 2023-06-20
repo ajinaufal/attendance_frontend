@@ -24,6 +24,7 @@ function ProfilePage() {
     const [photo, setPhoto] = useState('');
     const [filePhoto, setFilePhoto] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,6 +64,9 @@ function ProfilePage() {
             if (fileSizeInMB > 5) {
                 console.log('File size exceeds the maximum limit of 5MB.');
             } else {
+                const reader = new FileReader();
+                reader.onload = () => setSelectedImage(reader.result as string);
+                reader.readAsDataURL(file);
                 console.log(file);
             }
         }
@@ -109,7 +113,7 @@ function ProfilePage() {
             <ModalComponents title={"Edit Profile"} isOpen={isOpenProfile} onClick={() => setIsOpenProfile(!isOpenProfile)}>
                 <form className="space-y-4 md:space-y-6" onSubmit={(e) => updateProfile(e, { name, email, handphone, position, id: token }, () => setIsOpenProfile(!isOpenProfile))} >
                     <div className="flex flex-col items-center">
-                        <img src={photo} alt="Photo" className="w-32 h-32 rounded-full" />
+                        <img src={selectedImage ?? photo} alt="Photo" className="w-32 h-32 rounded-full" />
                         <button type="button" className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md" onClick={handleButtonClickPhoto}>Change Photo</button>
                         <input type="file" className="hidden" id="inputPhoto" ref={fileInputRef} onChange={handleFileInputChangePhoto} accept=".jpg, .jpeg, .png, .webp" />
                     </div>
