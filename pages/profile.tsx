@@ -3,8 +3,11 @@ import LayoutComponents from "@/components/layouts_components";
 import ModalComponents from "@/components/modal_components";
 import { getToken, withAuth } from "@/helper/cookies_helper";
 import ProfileModel from "@/models/profile";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router'
+import Image from 'next/image'
+import fs from 'fs';
+import path from 'path';
 
 
 function ProfilePage() {
@@ -18,6 +21,9 @@ function ProfilePage() {
     const [isOpenPassword, setisOpenPassword] = useState(false);
     const [password, setPassword] = useState('');
     const [currentPassword, setcurrentPassword] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [filePhoto, setFilePhoto] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,6 +36,7 @@ function ProfilePage() {
                 setHandphone(data.handphone);
                 setPosition(data.position);
                 setToken(data.token);
+                setPhoto(data.photo);
             }
         };
         fetchData();
@@ -41,12 +48,35 @@ function ProfilePage() {
         setcurrentPassword('');
     }
 
+    const handleButtonClickPhoto = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileInputChangePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files && event.target.files[0];
+
+        if (file) {
+            setFilePhoto(file)
+            const fileSizeInMB = file.size / (1024 * 1024);
+            if (fileSizeInMB > 5) {
+                console.log('File size exceeds the maximum limit of 5MB.');
+            } else {
+                console.log(file);
+            }
+        }
+    };
+
     return (
         <LayoutComponents>
             <div className='flex flex-col w-full justify-center items-center h-screen lg:px-8'>
                 <div className="max-w-md bg-white border border-gray-200 rounded-lg box-border flex flex-col justify-center items-star w-full">
                     <button onClick={() => setIsOpenProfile(!isOpenProfile)} className="flex ml-4 lex items-center justify-center text-white bg-blue-400 font-medium rounded-lg text-sm px-4 py-2 hover:bg-blue-600 max-w-[4rem] self-end mr-4 mt-4">Edit</button>
                     <div className="flex flex-col pb-4 pl-4 pr-4 pt-1 gap-4">
+                        <div className="w-20 h-20 rounded-full overflow-hidden mx-auto">
+                            <img src={photo} alt="Photo" className="w-full h-full object-cover" />
+                        </div>
                         <h1 className="text-gray-900 font-bold text-xl leading-8 my-1">Profile</h1>
                         <div className="flex flex-row">
                             <div className="font-semibold">Name : </div>
@@ -78,6 +108,11 @@ function ProfilePage() {
             </div>
             <ModalComponents title={"Edit Profile"} isOpen={isOpenProfile} onClick={() => setIsOpenProfile(!isOpenProfile)}>
                 <form className="space-y-4 md:space-y-6" onSubmit={(e) => updateProfile(e, { name, email, handphone, position, id: token }, () => setIsOpenProfile(!isOpenProfile))} >
+                    <div className="flex flex-col items-center">
+                        <img src={photo} alt="Photo" className="w-32 h-32 rounded-full" />
+                        <button type="button" className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md" onClick={handleButtonClickPhoto}>Change Photo</button>
+                        <input type="file" className="hidden" id="inputPhoto" ref={fileInputRef} onChange={handleFileInputChangePhoto} accept=".jpg, .jpeg, .png, .webp" />
+                    </div>
                     <div>
                         <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">name</label>
                         <input type="text" id='email' className='bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder="" value={name} onChange={(e) => setName(e.target.value)} />

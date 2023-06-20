@@ -5,7 +5,7 @@ import '../app/globals.css'
 export default function LayoutComponents({ children }: { children: ReactNode }) {
     return (
         <div className='flex flex-row container mx-auto bg-white'>
-            <SidabarComponents name={'makan'}></SidabarComponents>
+            <SidabarComponents name={'Profile'}></SidabarComponents>
             {children}
         </div>
 

@@ -9,7 +9,7 @@ export default class ProfileModel {
     constructor(data: any) {
         this.token = data.token;
         this.name = data.name;
-        this.photo = data.name;
+        this.photo = data.photo;
         this.email = data.email;
         this.handphone = data.handphone;
         this.position = data.position;
